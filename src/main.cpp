@@ -28,7 +28,8 @@ std::string hasData(std::string s) {
 int main()
 {
   uWS::Hub h;
-
+  // disable buffering on stdout from printf
+  setbuf(stdout, NULL);
   //Set up parameters here
   double delta_t = 0.1; // Time elapsed between measurements [sec]
   double sensor_range = 50; // Sensor range [m]
@@ -56,11 +57,11 @@ int main()
 
       auto s = hasData(std::string(data));
       if (s != "") {
-      	
-      	
+
+
         auto j = json::parse(s);
         std::string event = j[0].get<std::string>();
-        
+
         if (event == "telemetry") {
           // j[1] is the data JSON object
 
@@ -81,7 +82,7 @@ int main()
 
 			pf.prediction(delta_t, sigma_pos, previous_velocity, previous_yawrate);
 		  }
-
+      pf.printout();
 		  // receive noisy observation data from the simulator
 		  // sense_observations in JSON format [{obs_x,obs_y},{obs_x,obs_y},...{obs_x,obs_y}]
 		  	vector<LandmarkObs> noisy_observations;
@@ -143,7 +144,7 @@ int main()
           auto msg = "42[\"best_particle\"," + msgJson.dump() + "]";
           // std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
-	  
+
         }
       } else {
         std::string msg = "42[\"manual\",{}]";
